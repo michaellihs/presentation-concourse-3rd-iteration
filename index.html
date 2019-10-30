@@ -67,13 +67,15 @@
 				<section data-markdown>
 				    <script type="text/template">
 				        ## Agenda
-				        - CI/CD Revisited
-				        - Pipelines that don't suck
-				        - How to setup Concourse
-				        - Concourse Architecture
-				        - Concourse Pipelines
-				        - Demo
-				        - Recap
+				        <ul style="list-style: none">
+				        <li><strong style="font-size: 150%">🥜</strong>&nbsp;&nbsp; CI/CD in a Nutshell</li>
+				        <li><strong style="font-size: 150%">🍭</strong>&nbsp;&nbsp; Pipelines that don't suck</li>
+				        <li><strong style="font-size: 150%">🔧</strong>&nbsp;&nbsp; How to setup Concourse</li>
+				        <li><strong style="font-size: 150%">📐</strong>&nbsp;&nbsp; Concourse Architecture</li>
+				        <li><strong style="font-size: 150%">🏗</strong>&nbsp;&nbsp; Concourse Building Blocks</li>
+				        <li><strong style="font-size: 150%">🖥</strong>&nbsp;&nbsp; Demo</li>
+				        <li><strong style="font-size: 150%">♻️</strong>&nbsp;&nbsp; Recap</li>
+				        </ul>
 				    </script>
 				</section>
 
@@ -94,21 +96,21 @@
 				    <script type="text/template">
 				        # Main Tasks of CI/CD
 
-				        * make building and delivering software more reliable
-				        * automate things that (used to) hurt
-				        * support working in small batches
-				        * let developers focus on features / value
-				        * establish feedback loops
-				        * <strong style="font-size: 150%">&Sigma;</strong> help developer to **improve the 4 key metrics**
+				        * make building and delivering software more <strong style="font-size: 150%">reliable</strong>
+				        * <strong style="font-size: 150%">automate</strong> things that (used to) hurt
+				        * support working in <strong style="font-size: 150%">small batches</strong>
+				        * let developers focus on features / <strong style="font-size: 150%">value</strong>
+				        * establish <strong style="font-size: 150%">feedback loops</strong>
+				        * help developer to <strong style="font-size: 150%">improve the 4 key metrics</strong>
 				    </script>
 				</section>
 
 
                 <section data-markdown>
                     <script type="text/template">
-                        <h1 style="font-size: 600%">Pipelines that don't suck</h1>
+						<h1 style="font-size: 600%">Pipelines that don't suck</h1>
 
-                        source: [Build pipelines that don't suck](https://github.com/sirech/talks/blob/master/2019-04-tw-build_pipelines.pdf)
+						### 🔗 [Build pipelines that don't suck](https://github.com/sirech/talks/blob/master/2019-04-tw-build_pipelines.pdf)
                     </script>
                 </section>
 
@@ -118,7 +120,7 @@
 						## A Good Pipeline is <i>code</i>
 							
 						* needs no modifications via UI
-						* keep it close to the app
+						* keep it close to the source code
 						* keep it in version control
 					</script>
 				</section>
@@ -138,6 +140,7 @@
 
 						* isolated builds (containers)
 						* might need a tradeoff between isolation and speed
+						* reproduce any build
 					</script>
 				</section>
 				<section data-markdown>
@@ -161,11 +164,14 @@
 				</section>
 				<section data-markdown>
 					<script type="text/template">
-						## Good Pipelines are <i>scalable</i>
+						## Good Pipelines are <i>scalable</i> <sup>*</sup>
 						
 						* find a tradeoff between reuse and coupling
 						* follow a similar structure
 						* parametrize steps
+						* treat your pipelines as cattle not as pets
+
+						<small><sup>*)</sup> in the sense of we can manage many of them</small>
 					</script>
 				</section>
 
@@ -179,11 +185,10 @@
 					<script type="text/template">
 				        ## Operators' Wish List
 
-				        * simple deployment
+				        * easy deployment
 				          * containers
 				          * configuration as code
 				        * simple day 2 operations (updates, patches, backups)
-				          * staging
 				        * simple integration (VCS, IAM, logging, monitoring)
 				          * user / permission management
 				          * web hooks
@@ -195,7 +200,7 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        <h1 style="font-size: 600%">How to Set Up Concourse</h1>
+                        <h1 style="font-size: 600%">Concourse Setup</h1>
                     </script>
                 </section>
 								
@@ -220,7 +225,7 @@
 						
 						> "CI-First-Approach"
 						> 1. First spin-up CI infrastructure
-						> 2. Deploy everything else using Pipelines
+						> 2. Deploy everything else using pipelines
 
 						<p style="text-align: left"><a href="https://github.com/EngineerBetter/control-tower ">Control Tower</a> (EngineerBetter)</p>
 
@@ -282,7 +287,7 @@
                 	<script type="text/template">
 						## [Pipeline](https://concourse-ci.org/pipelines.html)
 						
-						* Glue code for blocks below
+						* Glues everything together
 						* Mainly configures
 						  * a set of **resources** (for input and output)
 						  * a sequence of **jobs**
@@ -295,8 +300,9 @@
 						## [Resources](https://concourse-ci.org/included-resources.html)
 						
 						* manage artifacts used in the pipeline (*inputs/outputs*)
-						* can be checked (for changes), pulled from and pushed to e.g., git, docker, artifactory, s3
-						* "*connects Concourse to the outside world*"
+						* can be checked (for changes), pulled from and pushed to 
+						  * e.g. git, docker, artifactory, s3
+						* *"connects Concourse to the outside world"*
 						<img src="images/resource.png" style="border: none; box-shadow: none">
                 	</script>
                 </section>
@@ -307,7 +313,7 @@
 
 						* determine the action(s) of your pipeline
 						* plan, which resource, which task, and in which order
-						* **you cannot pass anything between jobs**
+						* **you cannot pass artifacts between jobs**
 						<img src="images/job.png" width="80%" height="80%" style="border: none; box-shadow: none">
 					</script>
 				</section>
@@ -342,38 +348,6 @@
                         <h1 style="font-size: 600%">Advanced Concepts</h1>
                     </script>
                 </section>
-
-                <section data-markdown>
-						<script type="text/template">
-							## Hijacking Containers
-	
-							* check what is going on in a task / resource container
-
-							   ```bash
-							   fly -t demo hijack  --job pipeline/job
-							   fly -t demo hijack  --check pipeline/check	
-							   ```
-
-							* facilitates debugging of pipelines
-						</script>
-				</section>
-
-				<section data-markdown>
-						<script type="text/template">
-							## Executing Tasks in Isolation
-	
-							* run single pipeline task from command line
-
-							   ```bash
-							   fly -t demo execute -c hello-world.yml -i demo-repo=../	
-							   ```
-
-							  * `hello-world.yml` is the task file you want to run
-							  * `demo-repo` is a resource that you need in your job
-
-							* facilitates development of pipelines
-						</script>
-				</section>
 
 				<section data-markdown>
 						<script type="text/template">
@@ -417,11 +391,22 @@
 							  - name: job-1
 							    plan:
 							      - get: demo-repo
+							      # TODO check whether we need concourse-tasks
 							      - get: busy-box
 							      - task: task-1
 							        image: busy-box
 							        file: concourse-tasks/reused-task.yml
 							```
+						</script>
+				</section>
+
+				<section data-markdown>
+						<script type="text/template">
+							## The `meta` Pipeline
+
+							* *"Pipeline of Pipelines"* 
+							* Re-pipe the world in only a few seconds
+							* Scan your Git[Lab|Hub] server and create all the pipelines
 						</script>
 				</section>
 
@@ -438,16 +423,6 @@
 						</script>
 				</section>
 
-				<section data-markdown>
-						<script type="text/template">
-							## The `meta` Pipeline
-
-							* *"Pipeline of Pipelines"* 
-							* Re-pipe the world in only a few seconds
-							* Scan your Git[Lab|Hub] server and create all the pipelines
-						</script>
-				</section>
-
                 <section data-markdown>
                     <script type="text/template">
                         <h1 style="font-size: 800%">Recap</h1>
@@ -456,100 +431,34 @@
 
 				<section data-markdown>
 					<script type="text/template">
-						## A good pipeline is ...
+						## The good
 
-						<table>
-							<thead>
- 								<tr>
-									<th align="center">attribute</th>
-									<th align="center">concourse</th>
-									<th></th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr>
-									<td><i>code</i></td>
-									<td><span class="fragment" data-fragment-index="1">all configuration in git</span></td>
-									<td><span class="fragment" data-fragment-index="1"><span style="color: green">&#10004;</span></span></td>
-								</tr>
-								<tr>
-									<td><i>maintainable</i></td>
-									<td><span class="fragment" data-fragment-index="2">declarative but debugging experience required</span></td>
-									<td><span class="fragment" data-fragment-index="2"><span style="color: green">&#10004;</span></span></td>
-								</tr>
-								<tr>
-									<td><i>reliable</i></td>
-									<td><span class="fragment" data-fragment-index="3">all resources are versioned, pinning to versions</span></td>
-									<td><span class="fragment" data-fragment-index="3"><span style="color: green">&#10004;</span></span></td>
-								</tr>
-								<tr>
-									<td><i>fast</i></td>
-									<td><span class="fragment" data-fragment-index="4">caching of resources, adding workers easily</span></td>
-									<td><span class="fragment" data-fragment-index="4"><span style="color: green">&#10004;</span></span></td>
-								</tr>
-								<tr>
-									<td><i>visual</i></td>
-									<td><span class="fragment" data-fragment-index="5">dependencies and failures visible</span></td>
-									<td><span class="fragment" data-fragment-index="5"><span style="color: green">&#10004;</span></span></td>
-								</tr>
-								<tr>
-									<td><i>scalable</i></td>
-									<td><span class="fragment" data-fragment-index="6">reuse of resources and tasks</span></td>
-									<td><span class="fragment" data-fragment-index="6"><span style="color: green">&#10004;</span></span></td>
-								</tr>
-							</tbody>
-						</table>
+						<ul style="list-style: none; font-size: 120%">
+						<span class="fragment" data-fragment-index="1"><li>😀 pipelines as code</li></span>
+						<span class="fragment" data-fragment-index="2"><li>😀 pipelines as 1st class citizens</li></span>
+						<span class="fragment" data-fragment-index="3"><li>😀 containerized builds</li></span>
+						<span class="fragment" data-fragment-index="4"><li>😀 all resources are versioned, pinning</li></span>
+						<span class="fragment" data-fragment-index="5"><li>😀 adding workers easily</li></span>
+						<span class="fragment" data-fragment-index="6"><li>😀 configuration as code</li></span>
+						</ul>
+
 					</script>
 				</section>
-
-                <section data-markdown>
-                    <script type="text/template">
-                        <h1 style="font-size: 600%">Downsides</h1>
-                    </script>
-                </section>
 
 				<section data-markdown>
 					<script type="text/template">
-						## downsides of concourse
+						## The not so good
 
-						* debugging requires a lot of experience
-						* less flexibility
-						* few resources on the internet
-						* small community
+						<ul style="list-style: none; font-size: 120%">
+							<span class="fragment" data-fragment-index="1"><li>🤔 pipeline debugging</li></span>
+							<span class="fragment" data-fragment-index="2"><li>🤔 declarative pipelines</li></span>
+							<span class="fragment" data-fragment-index="3"><li>🤔 highly opinionated</li></span>
+							<span class="fragment" data-fragment-index="4"><li>🤔 small community</li></span>
+						</ul>
+
 					</script>
 				</section>
 
-                <section data-markdown>
-                    <script type="text/template">
-                        <h1 style="font-size: 600%">Concourse <br>vs Jenkins</h1>
-                    </script>
-                </section>
-
-
-				<section data-markdown>
-					<script type="text/template">
-						## Stackoverflow...
-
-						<img src="images/stackoverflow.png" width="60%" height="60%" style="border: none; box-shadow: none">
-					</script>
-				</section>
-
-
-				<section data-markdown>
-					<script type="text/template">
-						## what does concourse bring compared to jenkins? 
-
-						* focus on pipelines
-						  * pipelines as DAGs (fan-in and fan-out)
-						* containerized builds by default
-						* easy to operate (no snowflakes, versioning of config, easy updates)
-						* good caching mechanisms
-						* yaml vs groovy
-						* few integrations
-						* smaller community
-						* few resources on the internet
-					</script>
-				</section>
 
 				<section data-markdown>
 					<script type="text/template">
