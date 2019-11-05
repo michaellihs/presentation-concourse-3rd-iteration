@@ -51,195 +51,169 @@
 		</div>
 		<div class="reveal">
 			<div class="slides">
-				<section>
-					<h1>Concourse CI</h1>
+<section>
+<h1>Concourse CI</h1>
 
-					<h2>DevFest Karlsruhe 2019</h2>
-					<img src="images/complex-failed-pipeline.png" style="border: 0; box-shadow: none;" />
-				</section>
-				<section data-markdown>
-				    <script type="text/template">
-					# Michael Lihs
-					## <a href="https://twitter.com/kaktusmimi">@kaktusmimi</a>
-					## with support from Alexander Müssig <a href="https://twitter.com/muehsi">@muehsi</a>
-					</script>
-				</section>
-				<section data-markdown>
-				    <script type="text/template">
-				        ## Agenda
-				        <ul style="list-style: none">
-				        <li><strong style="font-size: 150%">🥜</strong>&nbsp;&nbsp; CI/CD in a Nutshell</li>
-				        <li><strong style="font-size: 150%">🍭</strong>&nbsp;&nbsp; Pipelines that don't suck</li>
-				        <li><strong style="font-size: 150%">🔧</strong>&nbsp;&nbsp; How to setup Concourse</li>
-				        <li><strong style="font-size: 150%">📐</strong>&nbsp;&nbsp; Concourse Architecture</li>
-				        <li><strong style="font-size: 150%">🏗</strong>&nbsp;&nbsp; Concourse Building Blocks</li>
-				        <li><strong style="font-size: 150%">🖥</strong>&nbsp;&nbsp; Demo</li>
-				        <li><strong style="font-size: 150%">♻️</strong>&nbsp;&nbsp; Recap</li>
-				        </ul>
-				    </script>
-				</section>
+<h2>DevFest Karlsruhe 2019</h2>
+<img src="images/complex-failed-pipeline.png" style="border: 0; box-shadow: none;" />
+</section>
 
-				<section data-markdown>
-				    <script type="text/template">
-				        # Four Key Metrics
+<section data-markdown>
+<script type="text/template">
+# Michael Lihs
+# <a href="https://twitter.com/kaktusmimi">@kaktusmimi</a>
+</script>
+</section>
 
-				        ## 1. lead time
-				        ## 2. deployment frequency
-				        ## 3. mean time to restore
-				        ## 4. change fail percentage
+<section data-markdown>
+<script type="text/template">
+## Agenda
+<ul style="list-style: none">
+	<li><strong style="font-size: 150%">🥜</strong>&nbsp;&nbsp; <a href="#nutshell">CI/CD in a Nutshell</a></li>
+<li><strong style="font-size: 150%">✅</strong>&nbsp;&nbsp; <a href="#expectations">CI/CD Server Expectations</a></li>
+<li><strong style="font-size: 150%">🔧</strong>&nbsp;&nbsp; <a href="#setup">How to setup Concourse</a></li>
+<li><strong style="font-size: 150%">📐</strong>&nbsp;&nbsp; <a href="#architecture">Concourse Architecture</a></li>
+<li><strong style="font-size: 150%">🏗</strong>&nbsp;&nbsp; <a href="#blocks">Concourse Building Blocks</a></li>
+<li><strong style="font-size: 150%">🖥</strong>&nbsp;&nbsp; <a href="#demo">Demo</a></li>
+	<li><strong style="font-size: 150%">♻️</strong>&nbsp;&nbsp; <a href="#recap">Recap</a></li>
+</ul>
+</script>
+</section>
 
-				        see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">ThoughtWorks Technology Radar - Four Key Metrics</a>
-				    </script>
-				</section>
+<section data-markdown id="nutshell">
+<script type="text/template">
+<h1 style="font-size: 600%">CI/CD in a Nutshell 🥜</h1>
+</script>
+</section>
 
-				<section data-markdown>
-				    <script type="text/template">
-				        # Main Tasks of CI/CD
+<section data-markdown>
+<script type="text/template">
+# Four Key Metrics
 
-				        * make building and delivering software more <strong style="font-size: 150%">reliable</strong>
-				        * <strong style="font-size: 150%">automate</strong> things that (used to) hurt
-				        * support working in <strong style="font-size: 150%">small batches</strong>
-				        * let developers focus on features / <strong style="font-size: 150%">value</strong>
-				        * establish <strong style="font-size: 150%">feedback loops</strong>
-				        * help developer to <strong style="font-size: 150%">improve the 4 key metrics</strong>
-				    </script>
-				</section>
+## 1. lead time
+## 2. deployment frequency
+## 3. mean time to restore
+## 4. change fail percentage
 
+see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">ThoughtWorks Technology Radar - Four Key Metrics</a>
+</script>
+</section>
 
-                <section data-markdown>
-                    <script type="text/template">
-						<h1 style="font-size: 600%">Pipelines that don't suck</h1>
+<section data-markdown>
+<script type="text/template">
+# Main Tasks of CI/CD
 
-						### 🔗 [Build pipelines that don't suck](https://github.com/sirech/talks/blob/master/2019-04-tw-build_pipelines.pdf)
-                    </script>
-                </section>
+* make building and delivering software more <strong style="font-size: 150%">reliable</strong>
+* <strong style="font-size: 150%">automate</strong> things that (used to) hurt
+* support working in <strong style="font-size: 150%">small batches</strong>
+* let developers focus on features / <strong style="font-size: 150%">value</strong>
+* establish <strong style="font-size: 150%">feedback loops</strong>
+* help developer to <strong style="font-size: 150%">improve the 4 key metrics</strong>
+</script>
+</section>
 
+<section data-markdown id="expectations">
+<script type="text/template">
+<h1 style="font-size: 500%">✅ CI/CD Server Expectations</h1>
+</script>
+</section>
 
-				<section data-markdown>
-					<script type="text/template">
-						## A Good Pipeline is <i>code</i>
-							
-						* needs no modifications via UI
-						* keep it close to the source code
-						* keep it in version control
-					</script>
-				</section>
+<section data-markdown id="expectations">
+<script type="text/template">
+## CI/CD Server Expectations 1
 
-                <section data-markdown>
-					<script type="text/template">
-						## A good Pipeline is <i>maintainable</i>
-						
-						* declarative (?)
-						* locally executable
-						* easy to debug
-					</script>
-				</section>
-				<section data-markdown>
-					<script type="text/template">
-						## A good Pipeline is <i>reliable</i>
+* CI/CD infrastructure is often operated by devs
+* easy setup and day 2 operations
+  * run it in containers
+  * updates, plugins...
+* integration in company infrastructure
+  * IAM, Version Control, logging, monitoring
+* configuration as code
+* scalability (build agents)
+</script>
+</section>
 
-						* isolated builds (containers)
-						* might need a tradeoff between isolation and speed
-						* reproduce any build
-					</script>
-				</section>
-				<section data-markdown>
-					<script type="text/template">
-						## A good Pipeline is <i>fast</i>
-						
-						* throw hardware at the problem
-						* parallelization
-						* avoid repeating steps
-						* make use of caching
-                    </script>
-				</section>
-				<section data-markdown>
-					<script type="text/template">
-						## Good Pipelines are <i>visual</i>
-						
-						* avoid the <i>god step</i>
-						* avoid logging overdose
-						* visualize dependencies
-					</script>
-				</section>
-				<section data-markdown>
-					<script type="text/template">
-						## Good Pipelines are <i>scalable</i> <sup>*</sup>
-						
-						* find a tradeoff between reuse and coupling
-						* follow a similar structure
-						* parametrize steps
-						* treat your pipelines as cattle not as pets
+<section data-markdown>
+<script type="text/template">
+## CI/CD Server Expectations 2
 
-						<small><sup>*)</sup> in the sense of we can manage many of them</small>
-					</script>
-				</section>
+* pipelines as first-class-citizens
+  * proper visualization
+  * more complex pipelines, a.k.a. fan-in and fan-out
+* pipelines as code
+  * declarative description
+  * no UI needed for configuration
+  * kept in version control, close to the app
+</script>
+</section>
 
-                <section data-markdown>
-                    <script type="text/template">
-                        <h1 style="font-size: 600%">Embrace your Operators ❤️</h1>
-                    </script>
-                </section>
+<section data-markdown>
+<script type="text/template">
+## CI/CD Server Expectations 3
+
+* customizable build environment
+  * reliable
+  * containerized builds
+  * easy cleanup
+* develop and debug pipelines on local machines
+  * locally executable
+  * easy to debug
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+<h1 style="font-size: 600%">Pipelines that don't suck</h1>
+
+### 🔗 [Build pipelines that don't suck](https://github.com/sirech/talks/blob/master/2019-04-tw-build_pipelines.pdf) 👍👍👍
+</script>
+</section>
+
+<section data-markdown id="setup">
+<script type="text/template">
+<h1 style="font-size: 600%">Concourse Setup 🔧</h1>
+</script>
+</section>
 
 				<section data-markdown>
 					<script type="text/template">
-				        ## Operators' Wish List
+						## Docker Compose
 
-				        * easy deployment
-				          * containers
-				          * configuration as code
-				        * simple day 2 operations (updates, patches, backups)
-				        * simple integration (VCS, IAM, logging, monitoring)
-				          * user / permission management
-				          * web hooks
-				        * scalability (build agents, high availability)
-				          * customized build agents
-				          * zero downtime upgrades
-					</script>
-				</section>
+						* official Docker Compose setup
 
-                <section data-markdown>
-                    <script type="text/template">
-                        <h1 style="font-size: 600%">Concourse Setup</h1>
-                    </script>
-                </section>
-								
-				<section data-markdown>
-					<script type="text/template">
-						### Docker Compose
-						
-							$ wget https://concourse-ci.org/docker-compose.yml
-							$ docker-compose up -d
+						    ```
+						    $ wget https://concourse-ci.org/docker-compose.yml
+						    $ docker-compose up -d
+						    ```
 
-						<br>
-						* easiest way to spin up local test setup
 						* further services (Vault, RocketChat...) can be added
 						* more elaborate `docker-compose.yml`: https://github.com/michaellihs/concourse-demo/blob/master/docker-compose.yml
 
-                    </script>
-                </section>
+					</script>
+				</section>
 
                 <section data-markdown>
                     <script type="text/template">
 						## Cloud Installer
 						
-						> "CI-First-Approach"
-						> 1. First spin-up CI infrastructure
-						> 2. Deploy everything else using pipelines
+						* *CI-First-Approach*:
+						  1. First spin-up CI infrastructure
+						  2. Deploy everything else using pipelines
 
-						<p style="text-align: left"><a href="https://github.com/EngineerBetter/control-tower ">Control Tower</a> (EngineerBetter)</p>
+						* <a href="https://github.com/EngineerBetter/control-tower ">Control Tower</a> (EngineerBetter)
 
-
+						    ```
 						    $ AWS_ACCESS_KEY_ID=<access-key-id> \
 						         AWS_SECRET_ACCESS_KEY=<secret-access-key> \
 						         control-tower deploy --iaas aws <your-project-name>
+							```
 
 					</script>
 				</section>
 				
-                <section data-markdown>
+                <section data-markdown id="architecture">
                     <script type="text/template">
-                        <h1 style="font-size: 600%">Concourse Overview</h1>
+                        <h1 style="font-size: 600%">Concourse Architecture</h1>
                     </script>
                 </section>
 
@@ -273,14 +247,17 @@
                 	</script>
                 </section>
 
-				<section data-markdown>
+				<section data-markdown id="blocks">
 					<script type="text/template">
 						<h1 style="font-size: 600%">Basic Building Blocks</h1>
 					</script>
 				</section>
 
-                <section>
-					<img src="images/building-blocks.png" style="border: none; box-shadow: none">
+                <section data-markdown>
+					<script type="text/template">
+						## Overview
+						<img src="images/building-blocks.png" style="border: none; box-shadow: none">
+					</script>
 				</section>
 
 				<section data-markdown>
@@ -288,9 +265,9 @@
 						## [Pipeline](https://concourse-ci.org/pipelines.html)
 						
 						* Glues everything together
-						* Mainly configures
-						  * a set of **resources** (for input and output)
-						  * a sequence of **jobs**
+						* Mainly configures 2 things:
+						  1. set of **resources** (for input and output)
+						  1. sequence of **jobs**
                 	</script>
                 </section>
 				
@@ -300,7 +277,7 @@
 						## [Resources](https://concourse-ci.org/included-resources.html)
 						
 						* manage artifacts used in the pipeline (*inputs/outputs*)
-						* can be checked (for changes), pulled from and pushed to 
+						* can be **checked** (for changes), **pulled** from and **pushed** to
 						  * e.g. git, docker, artifactory, s3
 						* *"connects Concourse to the outside world"*
 						<img src="images/resource.png" style="border: none; box-shadow: none">
@@ -335,12 +312,117 @@
 				</section>
 
 
-                <section data-markdown>
-                    <script type="text/template">
-                        <h1 style="font-size: 800%">Demo Time</h1>
-                        see <a href="https://github.com/michaellihs/concourse-demo">github.com/michaellihs/concourse-demo</a>
-                    </script>
-                </section>
+<section data-markdown id="demo">
+	<script type="text/template">
+		<h1 style="font-size: 800%">Demo Time</h1>
+		🔗 <a href="https://github.com/michaellihs/concourse-demo">github.com/michaellihs/concourse-demo</a>
+	</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 1 - Concourse Setup
+
+* clone [demo repository](https://github.com/michaellihs/concourse-demo) and start Concourse with
+
+	```bash
+	git clone git@github.com:michaellihs/concourse-demo.git
+	cd concourse-demo
+	docker-compose up -d
+	```
+
+* download `fly` CLI to `/usr/local/bin/fly`
+
+	```bash
+	export concourse_fqdn=localhost
+	curl --noproxy ${concourse_fqdn} -s -f -o /usr/local/bin/fly \
+		"http://${concourse_fqdn}:8080/api/v1/cli?arch=amd64&platform=darwin"
+	chmod u+x /usr/local/bin/fly
+	```
+
+* login to Concourse via
+
+	```bash
+	fly --target=demo login \
+		--concourse-url="http://${concourse_fqdn}:8080" \
+		--username=test --password=test --team-name=main
+	```
+
+</script>
+</section>
+
+<section>
+	<h2>Tutorial 2 - Your first Pipeline</h2>
+
+first pipeline with a single job with a single task
+
+<pre><code data-line-numbers="4,8-11">---
+jobs:
+ - name: hello-world
+   plan:
+	 - task: hello-world
+	   config:
+		 platform: linux
+		 image_resource:
+		   type: docker-image
+		   source: {repository: busybox}
+		 run:
+		   path: echo
+		   args:
+			 - hello world
+</code></pre>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 2 - Upload your first Pipeline
+
+* upload pipeline via `fly`'s `set-pipeline` command
+
+   ```bash
+   cd tutorial-2
+   fly --target=demo set-pipeline \
+	   --non-interactive \
+	   --pipeline=tutorial-2 \
+	   --config=pipeline.yml
+   ```
+
+* afterwards we *unpause* the pipeline via
+
+   ```bash
+   fly --target=demo unpause-pipeline -p tutorial-2
+   ```
+
+* login to the Concourse UI and you will see a first pipeline <br>[http://localhost:8080/teams/main/pipelines/tutorial-2](http://localhost:8080/teams/main/pipelines/tutorial-2)
+
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 3 - Input and Tasks Files
+
+add `resources` and use `task` from a file
+
+```yaml
+---
+resources:
+- name: demo-repo
+  type: git
+  source:
+    uri: https://github.com/michaellihs/concourse-demo.git
+    branch: master
+
+jobs:
+- name: hello-world
+  plan:
+  - get: demo-repo
+  - task: hello-world
+    file: demo-repo/tutorial-3/hello-world.yml
+```
+</script>
+</section>
+
 
 
                 <section data-markdown>
@@ -423,15 +505,15 @@
 						</script>
 				</section>
 
-                <section data-markdown>
+                <section data-markdown id="recap">
                     <script type="text/template">
-                        <h1 style="font-size: 800%">Recap</h1>
+                        <h1 style="font-size: 800%">Recap ♻️</h1>
                     </script>
 				</section>
 
 				<section data-markdown>
 					<script type="text/template">
-						## The good
+						# The good
 
 						<ul style="list-style: none; font-size: 120%">
 						<span class="fragment" data-fragment-index="1"><li>😀 pipelines as code</li></span>
@@ -447,7 +529,7 @@
 
 				<section data-markdown>
 					<script type="text/template">
-						## The not so good
+						# The not so good
 
 						<ul style="list-style: none; font-size: 120%">
 							<span class="fragment" data-fragment-index="1"><li>🤔 pipeline debugging</li></span>
@@ -462,7 +544,7 @@
 
 				<section data-markdown>
 					<script type="text/template">
-						<h1 style="font-size: 800%">Your <br>Next Steps</h1>
+						<h1 style="font-size: 800%">👣 Your <br>Next Steps</h1>
 					</script>
 				</section>
 
@@ -478,16 +560,15 @@
 
 				<section data-markdown>
 					<script type="text/template">
-						<h1 style="font-size: 800%">Thank You!</h1>
-						## <a href="https://twitter.com/muehsi">@muehsi</a>
-						## <a href="https://twitter.com/kaktusmimi">@kaktusmimi</a>
+						<h1 style="font-size: 600%">Thank You 🤝</h1>
+						# <a href="https://twitter.com/kaktusmimi">@kaktusmimi</a>
 					</script>
 				</section>
 
 
 				<section data-markdown>
 					<script type="text/template">
-						<h1 style="font-size: 800%">Questions</h1>
+						<h1 style="font-size: 600%">Questions 🙋</h1>
 					</script>
 				</section>
 
