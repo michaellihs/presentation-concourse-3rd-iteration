@@ -154,7 +154,10 @@ body {
   box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.3); }
 
 .reveal code {
-  border-radius: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+  font-size: 0.9em;
+  border-radius: 8px;
   background-color: #555;
   color: #dcdcdc;
   font-family: monospace; }

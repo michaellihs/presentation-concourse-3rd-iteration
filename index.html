@@ -163,6 +163,19 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 
 <section data-markdown>
 <script type="text/template">
+## CI/CD Server Expectations 4
+
+* credentials management
+  * properly integrate existing solutions
+	* a.k.a. integrate Hashicorp Vault
+* manage many pipelines easily
+  * like 100s of pipelines...
+  * automatically update them upon change
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
 <h1 style="font-size: 600%">Pipelines that don't suck</h1>
 
 ### 🔗 [Build pipelines that don't suck](https://github.com/sirech/talks/blob/master/2019-04-tw-build_pipelines.pdf) 👍👍👍
@@ -314,9 +327,24 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 
 <section data-markdown id="demo">
 	<script type="text/template">
-		<h1 style="font-size: 800%">Demo Time</h1>
+		<h1 style="font-size: 600%">Demo Time<br> 🖥</h1>
 		🔗 <a href="https://github.com/michaellihs/concourse-demo">github.com/michaellihs/concourse-demo</a>
 	</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorials in Demo Repository
+
+* check the demo repository at [github.com/michaellihs/concourse-demo](https://github.com/michaellihs/concourse-demo)
+* root folder contains a `docker-compose.yml` that brings everything you need
+  * Concourse DB, Web & Worker
+  * Vault
+* contains also dummy certificates 😱
+  * 🔥 never ever use this repo in production
+* each tutorial contains a `setup-pipeline.sh` script
+  * before you try out any other tutorial, make sure to once run `tutorial-1/setup-pipeline.sh`
+</script>
 </section>
 
 <section data-markdown>
@@ -351,26 +379,30 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 </script>
 </section>
 
-<section>
-	<h2>Tutorial 2 - Your first Pipeline</h2>
+<section data-markdown>
+<script type="text/template">
+## Tutorial 2 - Your first Pipeline
 
 first pipeline with a single job with a single task
 
-<pre><code data-line-numbers="4,8-11">---
+```yml
+---
 jobs:
- - name: hello-world
-   plan:
-	 - task: hello-world
-	   config:
-		 platform: linux
-		 image_resource:
-		   type: docker-image
-		   source: {repository: busybox}
-		 run:
-		   path: echo
-		   args:
-			 - hello world
-</code></pre>
+  - name: hello-world
+    plan:
+      - task: hello-world
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: busybox}
+          run:
+            path: echo
+            args:
+              - hello world
+```
+
+</script>
 </section>
 
 <section data-markdown>
@@ -414,201 +446,501 @@ resources:
     branch: master
 
 jobs:
-- name: hello-world
+- name: hello-world        # job image is specified in task file (shown later)
   plan:
-  - get: demo-repo
+  - get: demo-repo         # from `resources:name`
   - task: hello-world
-    file: demo-repo/tutorial-3/hello-world.yml
+    file: demo-repo/tutorial-3/hello-world.yml     # dir name from `get:`
+```
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 3 - Input and Tasks Files
+
+directory structure
+
+```raw
+└── demo-repo
+    └── tutorial-3
+        ├── hello-world.sh           # shell script to be executed in task
+        ├── hello-world.yml          # the tasks file
+        ├── pipeline.yml             # pipeline definition
+        └── setup-pipeline.sh
+
+```
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 3 - Input and Tasks Files
+
+content of `demo-repo/tutorial-3/hello-world.yml`
+
+```yaml
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source: {repository: busybox}
+
+inputs:
+  - name: demo-repo         # name from `get:` in `jobs:plan`
+
+run:
+  path: demo-repo/tutorial-3/hello-world.sh
+```
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 4 - Parametrized Tasks
+
+pipeline with parametrized task
+
+```yaml
+---
+resources:
+  - name: demo-repo
+    type: git
+    source:
+      uri: https://github.com/michaellihs/concourse-demo.git
+      branch: master
+  - name: busy-box                    # we now have the job image as a resource
+    type: docker-image
+    source: {repository: busybox}
+
+jobs:
+  - name: hello-parameters
+    plan:
+      - get: demo-repo
+      - get: busy-box
+      - task: hello-parameters
+        image: busy-box
+        file: demo-repo/tutorial-4/hello-params.yml
+        params:
+          GREETING: "hello parameters"          # passing parameters to task
+```
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 4 - Parametrized Tasks
+
+parametrized task file
+
+```yaml
+---
+platform: linux
+
+inputs:
+  - name: demo-repo    # that's where our shell script comes from
+
+params:                # important section!!!
+  GREETING:
+
+run:
+  path: demo-repo/tutorial-4/hello-params.sh
+```
+
+`hello-params.sh` shell script
+
+```bash
+#!/bin/sh
+echo "${GREETING}"
+```
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 5 - Settings (a.k.a. vars)
+
+* pipeline with [settings](https://concourse-ci.org/pipeline-vars-example.html)
+
+   ```yaml
+   ---
+
+   # same resources like in tutorial 4
+
+   jobs:
+     - name: hello-settings
+       plan:
+         - get: demo-repo
+         - get: busy-box
+         - task: hello-parameters
+           image: busy-box
+           file: demo-repo/tutorial-5/hello-settings.yml
+           params:
+             GREETING: ((greeting))       # this is a variable :)
+   ```
+
+* the `hello-settings.yml` file and shell script looks the same like in tutorial 4
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 5 - Settings (a.k.a. vars)
+
+* `settings.yml` file
+
+   ```yaml
+   greeting: "hello settings"
+   ```
+
+* `fly` command to upload pipeline
+
+   ```bash
+   ../fly --target=demo set-pipeline \
+       --non-interactive \
+       --pipeline=tutorial-5 \
+       --load-vars-from=settings.yml \     # look: here we use the settings.yml
+       --config=pipeline.yml
+   ```
+
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 6 - Credentials Management
+
+`docker-compose.yml` revisited
+```yaml
+services:
+  web:
+    #...
+    environment:
+      CONCOURSE_VAULT_URL: https://vault:8200
+      CONCOURSE_VAULT_AUTH_BACKEND: cert
+      CONCOURSE_VAULT_CA_CERT: /vault-certs/vault-ca.crt
+      CONCOURSE_VAULT_CLIENT_CERT: /vault-certs/concourse.crt
+      CONCOURSE_VAULT_CLIENT_KEY: /vault-certs/concourse.key
+      # ...
+
+  # see https://concourse-ci.org/vault-credential-manager.html
+  vault:
+    image: vault
+    cap_add: [IPC_LOCK]
+    ports: ["8200:8200"]
+    volumes:
+      - ./vault/vault-certs:/vault/certs       # NEVER EVER USE THIS
+      - ./vault/vault-config:/vault/config     # IN PRODUCTION!!!!!!
+    command: server
+```
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 6 - Credentials Management
+
+* initialize Vault with
+
+   ```raw
+   cd tutorial-6
+   ./setup-vault.sh
+   ```
+
+* make sure to copy the `token` from the output
+
+   ```raw
+   Success! You are now authenticated. The token information displayed below
+   is already stored in the token helper. You do NOT need to run "vault login"
+   again. Future Vault requests will automatically use this token.
+   
+   Key                  Value
+   ---                  -----
+   token                s.zj0Reaoatp9dUgw8TXaK64r4
+   ```
+* you can login to the Vault UI via [https://localhost:8200/ui](https://localhost:8200/ui) using this token
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 6 - Credentials Management
+
+* when reading secrets from Vault, Concourse will look in the following paths, in order:
+
+   ```raw
+   /concourse/TEAM_NAME/PIPELINE_NAME/foo_param
+   /concourse/TEAM_NAME/foo_param
+   ```
+
+* see [Concourse Credentials Lookup Rules](https://concourse-ci.org/vault-credential-manager.html#vault-credential-lookup-rules)
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 6 - Credentials Management
+
+* let's write some secrets to Vault...
+
+    ```bash
+    write_vault() {
+       path=$1
+       key=$2
+       secret=$3
+
+       docker exec -it demo_vault_1 /bin/sh \
+    	   -c "vault kv put -tls-skip-verify concourse/${path} ${key}=${secret}"
+    }
+
+    write_vault "main/tutorial-6/vault-param-1" "val" "secret-1"
+    write_vault "main/tutorial-6/vault-param-2" "value" "secret-2"
+    ```
+
+* simply use the pre-defined script
+
+   ```raw
+   cd tutorial-6
+   ./setup-vault.sh
+   ```
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 6 - Credentials Management
+
+pipeline using secrets from Vault
+```yaml
+---
+
+# ... same as in previous tutorials ...
+
+jobs:
+  - name: hello-parameters
+    plan:
+      - get: demo-repo
+      - get: busy-box
+      - task: hello-parameters
+        image: busy-box
+        file: demo-repo/tutorial-6/hello-vault.yml
+        params:
+          GREETING: "((vault-param-1.val))"        # here we use it
+          ANOTHER_GREETING: "((vault-param-2))"
+```
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 7 - Build and push Docker image
+
+pipeline for building and pushing a Docker image
+
+```yaml
+---
+resources:
+  - name: resource-git      # we expect a Dockerfile in the root of this repo!
+    type: git
+    source:
+      uri: https://github.com/michaellihs/rocketchat-notification-resource.git
+      branch: master
+  - name: resource-image
+    type: docker-image
+    source:
+      repository: ((docker_repo))/rocket-notify-resource
+      username: ((docker_user))
+      password: ((docker_password))
+jobs:
+  - name: build-rocket-notify-resource
+    plan:
+      - get: resource-git      # Dockerfile from git repository
+        trigger: true
+      - put: resource-image    # push Docker image to Dockerhub
+        params:
+          build: resource-git  # build Docker image from git repository
+```
+
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 8 - Repipe the World
+
+* *"Pipeline of Pipelines"*
+* Re-pipe the world in only a few seconds
+* Scan your Git[Lab|Hub] server and create all the pipelines
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 8 - Repipe the World
+
+meta pipeline
+
+```yaml
+---
+resources:
+  - name: demo-repo
+    type: git
+    source:
+      uri: https://github.com/michaellihs/concourse-demo.git
+      branch: master
+  - name: ubuntu
+    type: docker-image
+    source: {repository: ubuntu}
+
+jobs:
+  - name: repipe-the-world
+    plan:
+      - get: demo-repo
+      - get: ubuntu
+      - task: repipe-the-world
+        image: ubuntu
+        file: demo-repo/tutorial-8/repipe-the-world.yml
+```
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 8 - Repipe the World
+
+the shell script for the *re-pipe the world* task
+```bash
+#!/usr/bin/env bash
+
+# fly login ...
+
+for pipeline in $(ls -d demo-repo/tutorial* | xargs -n 1 basename); do
+    if [[ "${pipeline}" != "tutorial-1" && "${pipeline}" != "tutorial-8" ]]; then
+        if [[ -f "demo-repo/${pipeline}/settings.yml" ]]; then
+            ./fly --target=demo set-pipeline --non-interactive \
+                --pipeline=${pipeline} \
+                --load-vars-from=demo-repo/${pipeline}/settings.yml \
+                --config=demo-repo/${pipeline}/pipeline.yml
+        else
+            ./fly --target=demo set-pipeline --non-interactive \
+                --pipeline=${pipeline} \
+                --config=demo-repo/${pipeline}/pipeline.yml
+        fi
+        ./fly --target=demo unpause-pipeline -p ${pipeline}
+    fi
+done
 ```
 </script>
 </section>
 
 
+<section data-markdown id="recap">
+	<script type="text/template">
+		<h1 style="font-size: 800%">Recap ♻️</h1>
+	</script>
+</section>
 
-                <section data-markdown>
-                    <script type="text/template">
-                        <h1 style="font-size: 600%">Advanced Concepts</h1>
-                    </script>
-                </section>
+<section data-markdown>
+	<script type="text/template">
+		# The good
 
-				<section data-markdown>
-						<script type="text/template">
-							## Credentials Management with Vault
-	
-							* configure Concourse to use Vault
+		<ul style="list-style: none; font-size: 120%">
+		<span class="fragment" data-fragment-index="1"><li>😀 pipelines as code</li></span>
+		<span class="fragment" data-fragment-index="2"><li>😀 pipelines as 1st class citizens</li></span>
+		<span class="fragment" data-fragment-index="3"><li>😀 manage 100s of pipelines</li></span>
+		<span class="fragment" data-fragment-index="4"><li>😀 containerized builds</li></span>
+		<span class="fragment" data-fragment-index="5"><li>😀 credentials management</li></span>
+		<span class="fragment" data-fragment-index="6"><li>😀 configuration as code</li></span>
+		<span class="fragment" data-fragment-index="6"><li>😎 visualization of pipelines</li></span>
+		</ul>
 
-							   ```bash
-							   CONCOURSE_VAULT_URL: https://vault:8200
-							   CONCOURSE_VAULT_AUTH_BACKEND: cert
-							   CONCOURSE_VAULT_CA_CERT: /vault-certs/vault-ca.crt
-							   CONCOURSE_VAULT_CLIENT_CERT: /vault-certs/concourse.crt
-							   CONCOURSE_VAULT_CLIENT_KEY: /vault-certs/concourse.key
-							   ```
+	</script>
+</section>
 
-							* use `((pam_var))` placeholders in your pipelines
-							* Concourse replaces variables **at runtime**
-							* for configuration details see [Concourse Documentation on using Vault](https://concourse-ci.org/vault-credential-manager.html)
-						</script>
-				</section>
+<section data-markdown>
+	<script type="text/template">
+		# The not so good
 
-				<section data-markdown>
-						<script type="text/template">
-							## Re-Usable Tasks
-							* Load Tasks from Git repository
-							* Share across piplines / projects
+		<ul style="list-style: none; font-size: 120%">
+			<span class="fragment" data-fragment-index="1"><li>🤔 pipeline debugging</li></span>
+			<span class="fragment" data-fragment-index="2"><li>🤔 declarative pipelines</li></span>
+			<span class="fragment" data-fragment-index="3"><li>🤔 highly opinionated</li></span>
+			<span class="fragment" data-fragment-index="4"><li>🤔 small community</li></span>
+			<span class="fragment" data-fragment-index="5"><li>🤔 shell (script) hell</li></span>
+		</ul>
 
-
-							```
-							---
-							resources:
-							  - name: concourse-tasks
-							    type: git
-							    source:
-							      uri: https://github.com/michaellihs/concourse-tasks.git
-							  - name: busy-box
-							    type: docker-image
-							    source: {repository: busybox}
-
-							jobs:
-							  - name: job-1
-							    plan:
-							      - get: demo-repo
-							      # TODO check whether we need concourse-tasks
-							      - get: busy-box
-							      - task: task-1
-							        image: busy-box
-							        file: concourse-tasks/reused-task.yml
-							```
-						</script>
-				</section>
-
-				<section data-markdown>
-						<script type="text/template">
-							## The `meta` Pipeline
-
-							* *"Pipeline of Pipelines"* 
-							* Re-pipe the world in only a few seconds
-							* Scan your Git[Lab|Hub] server and create all the pipelines
-						</script>
-				</section>
-
-				<section data-markdown>
-						<script type="text/template">
-							## Custom Resources
-
-							* Docker Image with 3 (shell) scripts
-							  1. `check` check for new versions
-							  2. `in` pull new versions
-							  3. `out` put new versions
-							* e.g. Notification resource that sends messages to Threema
-							* see [Implementing Custom Resource Types](https://concourse-ci.org/implementing-resource-types.html)
-						</script>
-				</section>
-
-                <section data-markdown id="recap">
-                    <script type="text/template">
-                        <h1 style="font-size: 800%">Recap ♻️</h1>
-                    </script>
-				</section>
-
-				<section data-markdown>
-					<script type="text/template">
-						# The good
-
-						<ul style="list-style: none; font-size: 120%">
-						<span class="fragment" data-fragment-index="1"><li>😀 pipelines as code</li></span>
-						<span class="fragment" data-fragment-index="2"><li>😀 pipelines as 1st class citizens</li></span>
-						<span class="fragment" data-fragment-index="3"><li>😀 containerized builds</li></span>
-						<span class="fragment" data-fragment-index="4"><li>😀 all resources are versioned, pinning</li></span>
-						<span class="fragment" data-fragment-index="5"><li>😀 adding workers easily</li></span>
-						<span class="fragment" data-fragment-index="6"><li>😀 configuration as code</li></span>
-						</ul>
-
-					</script>
-				</section>
-
-				<section data-markdown>
-					<script type="text/template">
-						# The not so good
-
-						<ul style="list-style: none; font-size: 120%">
-							<span class="fragment" data-fragment-index="1"><li>🤔 pipeline debugging</li></span>
-							<span class="fragment" data-fragment-index="2"><li>🤔 declarative pipelines</li></span>
-							<span class="fragment" data-fragment-index="3"><li>🤔 highly opinionated</li></span>
-							<span class="fragment" data-fragment-index="4"><li>🤔 small community</li></span>
-						</ul>
-
-					</script>
-				</section>
+	</script>
+</section>
 
 
-				<section data-markdown>
-					<script type="text/template">
-						<h1 style="font-size: 800%">👣 Your <br>Next Steps</h1>
-					</script>
-				</section>
+<section data-markdown>
+	<script type="text/template">
+		<h1 style="font-size: 800%">👣 Your <br>Next Steps</h1>
+	</script>
+</section>
 
-				<section data-markdown>
-					<script type="text/template">
-						## Wanna Learn Concourse Now?
+<section data-markdown>
+	<script type="text/template">
+		## Wanna Learn Concourse Now?
 
-						* [The Concourse Tutorial by Stark & Wayne](https://concoursetutorial.com/)  is a good starting point
-						* Dig into [more advanced Concourse Examples](https://github.com/pivotalservices/concourse-pipeline-samples)
-						* Become cloudy with the [Spring Cloud Pipelines](https://cloudpipelines.github.io/concourse/) for Concourse
-					</script>
-				</section>
+		* [The Concourse Tutorial by Stark & Wayne](https://concoursetutorial.com/)  is a good starting point
+		* Dig into [more advanced Concourse Examples](https://github.com/pivotalservices/concourse-pipeline-samples)
+		* Become cloudy with the [Spring Cloud Pipelines](https://cloudpipelines.github.io/concourse/) for Concourse
+	</script>
+</section>
 
-				<section data-markdown>
-					<script type="text/template">
-						<h1 style="font-size: 600%">Thank You 🤝</h1>
-						# <a href="https://twitter.com/kaktusmimi">@kaktusmimi</a>
-					</script>
-				</section>
+<section data-markdown>
+	<script type="text/template">
+		<h1 style="font-size: 600%">Thank You <br>🤝</h1>
+		# <a href="https://twitter.com/kaktusmimi">@kaktusmimi</a>
+	</script>
+</section>
 
 
-				<section data-markdown>
-					<script type="text/template">
-						<h1 style="font-size: 600%">Questions 🙋</h1>
-					</script>
-				</section>
+<section data-markdown>
+	<script type="text/template">
+		<h1 style="font-size: 600%">Questions 🙋</h1>
+	</script>
+</section>
 
-				<section data-markdown>
-					<script type="text/template">
-						## References
+<section data-markdown>
+	<script type="text/template">
+		## References
 
-						* [Official Concourse Website](https://concourse-ci.org)
-						* [Concourse Documentation](https://concourse-ci.org/docs.html)
-						* [👍👍👍 Concourse Tutorial by Stark & Wayne](https://concoursetutorial.com/)
-						* [Concourse Pipeline Samples](https://github.com/pivotalservices/concourse-pipeline-samples/)
-						* [Concourse PROs and CONs on Reddit](https://www.reddit.com/r/devops/comments/8ut9tl/concourse_ci_pros_and_cons/)
-					</script>
-				</section>
+		* [Official Concourse Website](https://concourse-ci.org)
+		* [Concourse Documentation](https://concourse-ci.org/docs.html)
+		* [👍👍👍 Concourse Tutorial by Stark & Wayne](https://concoursetutorial.com/)
+		* [Concourse Pipeline Samples](https://github.com/pivotalservices/concourse-pipeline-samples/)
+		* [Concourse PROs and CONs on Reddit](https://www.reddit.com/r/devops/comments/8ut9tl/concourse_ci_pros_and_cons/)
+	</script>
+</section>
 
-				<section data-markdown>
-					<script type="text/template">
-						## References
+<section data-markdown>
+	<script type="text/template">
+		## References
 
-						* [Demo Repository for this Presentation](https://github.com/michaellihs/concourse-demo)
-						* [Continous Delivery mit Concourse CI (Andreas Falk)](https://andifalk.github.io/concourse-ci-demo/presentation/index.html)
-						* [👍👍👍 Build Pipelines that don't suck](https://github.com/sirech/talks/blob/master/2019-04-tw-build_pipelines.pdf)
-						* [Concourse Vault Integration](https://concourse-ci.org/vault-credential-manager.html)
-						* [Getting started with Concourse CI on Mac](https://medium.com/concourse-ci/getting-started-with-concourse-ci-on-macos-fb3a49a8e6b4)
-						* [ThoughtWorks on the "Go Script"](https://www.thoughtworks.com/insights/blog/praise-go-script-part-i)
-						* [GoCD: What does piplines as code really mean?](https://www.gocd.org/2017/05/02/what-does-pipelines-as-code-really-mean)
-					</script>
-				</section>
+		* [Demo Repository for this Presentation](https://github.com/michaellihs/concourse-demo)
+		* [Continous Delivery mit Concourse CI (Andreas Falk)](https://andifalk.github.io/concourse-ci-demo/presentation/index.html)
+		* [👍👍👍 Build Pipelines that don't suck](https://github.com/sirech/talks/blob/master/2019-04-tw-build_pipelines.pdf)
+		* [Concourse Vault Integration](https://concourse-ci.org/vault-credential-manager.html)
+		* [Getting started with Concourse CI on Mac](https://medium.com/concourse-ci/getting-started-with-concourse-ci-on-macos-fb3a49a8e6b4)
+		* [ThoughtWorks on the "Go Script"](https://www.thoughtworks.com/insights/blog/praise-go-script-part-i)
+		* [GoCD: What does piplines as code really mean?](https://www.gocd.org/2017/05/02/what-does-pipelines-as-code-really-mean)
+	</script>
+</section>
 
-				<section data-markdown>
-					<script type="text/template">
-						## References
+<section data-markdown>
+	<script type="text/template">
+		## References
 
-						* [HashiCorp Vault](https://www.vaultproject.io/)
-						* [BUCC](https://github.com/starkandwayne/bucc)
-						* [Control Tower](https://github.com/EngineerBetter/control-tower)
-						* [jsonnet](https://jsonnet.org/)
-						* [Spruce](https://github.com/geofffranks/spruce)
-					</script>
-				</section>
+		* [HashiCorp Vault](https://www.vaultproject.io/)
+		* [BUCC](https://github.com/starkandwayne/bucc)
+		* [Control Tower](https://github.com/EngineerBetter/control-tower)
+		* [jsonnet](https://jsonnet.org/)
+		* [Spruce](https://github.com/geofffranks/spruce)
+	</script>
+</section>
 
 			</div>
 		</div>
