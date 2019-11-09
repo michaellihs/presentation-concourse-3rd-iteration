@@ -129,7 +129,6 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 * integration in company infrastructure
   * IAM, Version Control, logging, monitoring
 * configuration as code
-* scalability (build agents)
 </script>
 </section>
 
@@ -164,6 +163,7 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 <script type="text/template">
 ## CI/CD Server Expectations 4
 
+* scalability (build agents)
 * customizable build environment
   * reliable
   * containerized builds
@@ -658,17 +658,17 @@ services:
    ./setup-vault.sh
    ```
 
+* this will auto-unseal Vault 😱
+   * 🔥 never ever use this repo in production
 * make sure to copy the `token` from the output
 
    ```raw
-   Success! You are now authenticated. The token information displayed below
-   is already stored in the token helper. You do NOT need to run "vault login"
-   again. Future Vault requests will automatically use this token.
-   
-   Key                  Value
-   ---                  -----
-   token                s.zj0Reaoatp9dUgw8TXaK64r4
+   ...
+   Unseal Key: 0Ph3dujBDH/WP6kaHPRtgKyNeD7bdQLsZqctdSr7kSg=
+   Login Token: s.BJLgizF9ltBlPSwqYqGcB1PV
+   ...
    ```
+
 * you can login to the Vault UI via [https://localhost:8200/ui](https://localhost:8200/ui) using this token
 </script>
 </section>
