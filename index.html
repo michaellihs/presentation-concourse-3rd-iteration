@@ -108,7 +108,7 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 * support working in <strong style="font-size: 150%">small batches</strong>
 * let developers focus on features / <strong style="font-size: 150%">value</strong>
 * establish <strong style="font-size: 150%">feedback loops</strong>
-* help developer to <strong style="font-size: 150%">improve the 4 key metrics</strong>
+* help teams to <strong style="font-size: 150%">improve the 4 key metrics</strong>
 </script>
 </section>
 
@@ -139,7 +139,7 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 
 * pipelines as first-class-citizens
   * proper visualization
-  * more complex pipelines, a.k.a. fan-in and fan-out
+  * complex pipelines, a.k.a. fan-in and fan-out
 * pipelines as code
   * declarative description
   * no UI needed for configuration
@@ -151,10 +151,9 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 <script type="text/template">
 ## CI/CD Server Expectations 3
 
-* customizable build environment
-  * reliable
-  * containerized builds
-  * easy cleanup
+* manage many pipelines easily
+  * like 100s of pipelines...
+  * automatically keep them up to date
 * develop and debug pipelines on local machines
   * locally executable
   * easy to debug
@@ -165,12 +164,12 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 <script type="text/template">
 ## CI/CD Server Expectations 4
 
+* customizable build environment
+  * reliable
+  * containerized builds
+  * easy cleanup
 * credentials management
   * properly integrate existing solutions
-	* a.k.a. integrate Hashicorp Vault
-* manage many pipelines easily
-  * like 100s of pipelines...
-  * automatically update them upon change
 </script>
 </section>
 
@@ -188,141 +187,139 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 </script>
 </section>
 
-				<section data-markdown>
-					<script type="text/template">
-						## Docker Compose
+<section data-markdown>
+<script type="text/template">
+## Docker Compose
 
-						* official Docker Compose setup
+* official Docker Compose setup
 
-						    ```
-						    $ wget https://concourse-ci.org/docker-compose.yml
-						    $ docker-compose up -d
-						    ```
+	```
+	$ wget https://concourse-ci.org/docker-compose.yml
+	$ docker-compose up -d
+	```
 
-						* further services (Vault, RocketChat...) can be added
-						* more elaborate `docker-compose.yml`: https://github.com/michaellihs/concourse-demo/blob/master/docker-compose.yml
+* further services (Vault, RocketChat...) can be added
+* more elaborate `docker-compose.yml`: https://github.com/michaellihs/concourse-demo/blob/master/docker-compose.yml
 
-					</script>
-				</section>
+</script>
+</section>
 
-                <section data-markdown>
-                    <script type="text/template">
-						## Cloud Installer
-						
-						* *CI-First-Approach*:
-						  1. First spin-up CI infrastructure
-						  2. Deploy everything else using pipelines
+<section data-markdown>
+<script type="text/template">
+## Cloud Installer
 
-						* <a href="https://github.com/EngineerBetter/control-tower ">Control Tower</a> (EngineerBetter)
+* "CI-First-Approach"
+  1. Spin-up CI infrastructure
+  2. Deploy everything else using pipelines
 
-						    ```
-						    $ AWS_ACCESS_KEY_ID=<access-key-id> \
-						         AWS_SECRET_ACCESS_KEY=<secret-access-key> \
-						         control-tower deploy --iaas aws <your-project-name>
-							```
+* <a href="https://github.com/EngineerBetter/control-tower ">Control Tower</a> (EngineerBetter)
 
-					</script>
-				</section>
+	```
+	$ AWS_ACCESS_KEY_ID=<access-key-id> \
+		 AWS_SECRET_ACCESS_KEY=<secret-access-key> \
+		 control-tower deploy --iaas aws <your-project-name>
+	```
+
+</script>
+</section>
 				
-                <section data-markdown id="architecture">
-                    <script type="text/template">
-                        <h1 style="font-size: 600%">📐 Concourse Architecture</h1>
-                    </script>
-                </section>
+<section data-markdown id="architecture">
+<script type="text/template">
+<h1 style="font-size: 600%">📐 Concourse Architecture</h1>
+</script>
+</section>
 
-                <section data-markdown>
-                	<script type="text/template">
-                        ## Concourse Architecture
-                        * Concourse web
-                        * Database
-                        * Concourse Worker
-                        * `fly` CLI
-                        * <https://docs.pivotal.io/p-concourse/4-x/architecture.html>
-                	</script>
-                </section>
+<section data-markdown>
+<script type="text/template">
+## Concourse Architecture
+* Concourse web
+* Database
+* Concourse Worker
+* `fly` CLI
+* <https://docs.pivotal.io/p-concourse/4-x/architecture.html>
+</script>
+</section>
 
-                <section>
-					<img src="images/architecture-overview.png" style="border: none; box-shadow: none">
-				</section>
+<section>
+<img src="images/architecture-overview.png" style="border: none; box-shadow: none">
+</section>
 
-				<section data-markdown>
-                	<script type="text/template">
-                        ## Some more details...
-                        * EVERYTHING runs in ~~Docker~~ containers
-                          * resources as well as jobs
-                        * Declarative (YAML) Pipelines
-                        * Stateless build jobs
-                          * no passing of artifacts inbetween jobs
-                        * Connects to external systems instead of re-inventing them
-                          * e.g. Vault (credentials management), LDAP (user management)
-                        * ~~Plugins~~ Resources (more lightweight)
-                        * Highly opinionated (take it or leave it)
-                	</script>
-                </section>
+<section data-markdown>
+<script type="text/template">
+## Some more details...
+* EVERYTHING runs in ~~Docker~~ containers
+  * resources as well as jobs
+* Stateless build jobs
+  * no passing of artifacts between jobs
+* Connects to external systems instead of re-inventing them
+  * e.g. Vault (credentials management), LDAP (user management)
+* ~~Plugins~~ Resources (more lightweight)
+</script>
+</section>
 
-				<section data-markdown id="blocks">
-					<script type="text/template">
-						<h1 style="font-size: 500%">🏗 Basic Building Blocks</h1>
-					</script>
-				</section>
+<section data-markdown id="blocks">
+<script type="text/template">
+<h1 style="font-size: 500%">🏗 Basic Building Blocks</h1>
+</script>
+</section>
 
-                <section data-markdown>
-					<script type="text/template">
-						## Overview
-						<img src="images/building-blocks.png" style="border: none; box-shadow: none">
-					</script>
-				</section>
+<section data-markdown>
+<script type="text/template">
+## Overview
+<img src="images/building-blocks.png" style="border: none; box-shadow: none">
+</script>
+</section>
 
-				<section data-markdown>
-                	<script type="text/template">
-						## [Pipeline](https://concourse-ci.org/pipelines.html)
-						
-						* Glues everything together
-						* Mainly configures 2 things:
-						  1. set of **resources** (for input and output)
-						  1. sequence of **jobs**
-                	</script>
-                </section>
-				
-				
-				<section data-markdown>
-                	<script type="text/template">
-						## [Resources](https://concourse-ci.org/included-resources.html)
-						
-						* manage artifacts used in the pipeline (*inputs/outputs*)
-						* can be **checked** (for changes), **pulled** from and **pushed** to
-						  * e.g. git, docker, artifactory, s3
-						* *"connects Concourse to the outside world"*
-						<img src="images/resource.png" style="border: none; box-shadow: none">
-                	</script>
-                </section>
+<section data-markdown>
+<script type="text/template">
+## [Pipeline](https://concourse-ci.org/pipelines.html)
 
-				<section data-markdown>
-					<script type="text/template">
-						## [Jobs](https://concourse-ci.org/jobs.html)
+* Glues everything together
+* Mainly configures 2 things:
+  1. set of **resources** (for input and output)
+  1. sequence of **jobs**
+</script>
+</section>
 
-						* determine the action(s) of your pipeline
-						* plan, which resource, which task, and in which order
-						* **you cannot pass artifacts between jobs**
-						<img src="images/job.png" width="80%" height="80%" style="border: none; box-shadow: none">
-					</script>
-				</section>
-				
 
-				<section data-markdown>
-					<script type="text/template">
-						## [Tasks](https://concourse-ci.org/tasks.html)
+<section data-markdown>
+<script type="text/template">
+## [Resources](https://concourse-ci.org/included-resources.html)
 
-						* smallest configurable unit in a Concourse pipeline
-						* function from inputs to outputs <img src="images/task.png" width="60%" height="60%" style="border: none; box-shadow: none">
-						* can either succeed or fail
-						* are combined to form a job in your pipeline
-						* can be externalized into `task.yml` files 
-						  * allows re-use
-						  * facilitates debugging
-					
-					</script>
-				</section>
+* manage artifacts used in the pipeline (*inputs/outputs*)
+* can be **checked** (changes), **pulled** from and **pushed** to
+  * e.g. git, docker, artifactory, s3
+* *"connects Concourse to the outside world"*
+<img src="images/resource.png" style="border: none; box-shadow: none">
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## [Jobs](https://concourse-ci.org/jobs.html)
+
+* determine the action(s) of your pipeline
+* plan, which resource, which task, and in which order
+* **you cannot pass artifacts between jobs**
+<img src="images/job.png" width="80%" height="80%" style="border: none; box-shadow: none">
+</script>
+</section>
+
+
+<section data-markdown>
+<script type="text/template">
+## [Tasks](https://concourse-ci.org/tasks.html)
+
+* smallest configurable unit in a Concourse pipeline
+* function from inputs to outputs <img src="images/task.png" width="60%" height="60%" style="border: none; box-shadow: none">
+* can either succeed or fail
+* are combined to form a job in your pipeline
+* can be externalized into `task.yml` files
+  * allows re-use
+  * facilitates debugging
+
+</script>
+</section>
 
 
 <section data-markdown id="demo">
@@ -375,6 +372,19 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 		--concourse-url="http://${concourse_fqdn}:8080" \
 		--username=test --password=test --team-name=main
 	```
+
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Tutorial 1 - Concourse Setup
+
+* the Concourse UI is now accessible via [https://localhost:8080](https://localhost:8080)
+  * username `test`
+  * password `test`
+* the Vault UI is now accessible via <br> [https://localhost:8200/ui](https://localhost:8200/ui)
+  * login token will be generated in tutorial 6
 
 </script>
 </section>
@@ -865,7 +875,7 @@ done
 		<ul style="list-style: none; font-size: 120%">
 			<span class="fragment" data-fragment-index="1"><li>🤔 pipeline debugging</li></span>
 			<span class="fragment" data-fragment-index="2"><li>🤔 declarative pipelines</li></span>
-			<span class="fragment" data-fragment-index="3"><li>🤔 highly opinionated</li></span>
+			<span class="fragment" data-fragment-index="3"><li>🤔 highly opinionated (take it or leave it)</li></span>
 			<span class="fragment" data-fragment-index="4"><li>🤔 small community</li></span>
 			<span class="fragment" data-fragment-index="5"><li>🤔 shell (script) hell</li></span>
 		</ul>
