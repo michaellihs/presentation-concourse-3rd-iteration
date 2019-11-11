@@ -80,111 +80,92 @@
 </script>
 </section>
 
-<section data-markdown id="nutshell">
-<script type="text/template">
-<h1 style="font-size: 600%">CI/CD in a Nutshell 🥜</h1>
-</script>
-</section>
-
-<section data-markdown>
-<script type="text/template">
-# Four Key Metrics
-
-## 1. lead time
-## 2. deployment frequency
-## 3. mean time to restore
-## 4. change fail percentage
-
-see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">ThoughtWorks Technology Radar - Four Key Metrics</a>
-</script>
-</section>
-
-<section data-markdown>
-<script type="text/template">
-# Main Tasks of CI/CD
-
-* make building and delivering software more <strong style="font-size: 150%">reliable</strong>
-* <strong style="font-size: 150%">automate</strong> things that (used to) hurt
-* support working in <strong style="font-size: 150%">small batches</strong>
-* let developers focus on features / <strong style="font-size: 150%">value</strong>
-* establish <strong style="font-size: 150%">feedback loops</strong>
-* help teams to <strong style="font-size: 150%">improve the 4 key metrics</strong>
-</script>
-</section>
-
 <section data-markdown id="expectations">
 <script type="text/template">
 <h1 style="font-size: 500%">✅ CI/CD Server Expectations</h1>
 </script>
 </section>
 
-<section data-markdown id="expectations">
+<section data-markdown>
 <script type="text/template">
-## CI/CD Server Expectations 1
+# CI/CD is mainly about...
 
-* CI/CD infrastructure is often operated by devs
-* easy setup and day 2 operations
-  * run it in containers
-  * updates, plugins...
-* integration in company infrastructure
-  * IAM, Version Control, logging, monitoring
-* configuration as code
+* building, testing and delivering software more <strong style="font-size: 150%">reliable</strong>
+* <strong style="font-size: 150%">automating</strong> things that (used to) hurt
+* supporting working in <strong style="font-size: 150%">small batches</strong>
+* letting developers focus on <strong style="font-size: 150%">features / value</strong>
+* establishing <strong style="font-size: 150%">feedback loops</strong>
 </script>
 </section>
 
 <section data-markdown>
 <script type="text/template">
-## CI/CD Server Expectations 2
+## Setup & Operations
 
-* pipelines as first-class-citizens
-  * proper visualization
-  * complex pipelines, a.k.a. fan-in and fan-out
+* easy & repeatable setup
+  * containers
+  * config as code
+  * no configuration in UI
+* easy day 2 operations
+  * updates
+  * plugins
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## 3rd party integration
+
+* user management
+  * permission management
+* version control (git)
+  * webhooks
+* logging, monitoring
+* credentials management
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Build Agents
+
+* scalable build agents
+* custom build agents
+  * containerized build environments
+  * reliable clean up
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## pipelines
+
+* pipelines as 1st class citizens
+  * visualization
+  * complex pipelines: fan-in, fan-out
 * pipelines as code
-  * declarative description
-  * no UI needed for configuration
-  * kept in version control, close to the app
+  * no configuration in UI
+  * declarative pipelines
+  * kept in version control, close to app
 </script>
 </section>
 
 <section data-markdown>
 <script type="text/template">
-## CI/CD Server Expectations 3
+## pipelines
 
-* manage many pipelines easily
-  * like 100s of pipelines...
-  * automatically keep them up to date
-* develop and debug pipelines on local machines
+* pipelines at scale
+  * manage 100s of pipelines
+  * automatically keep them up-to-date
+* support for pipeline developers
   * locally executable
   * easy to debug
-  * check [ThoughtWorks: In praise of the go script](https://www.thoughtworks.com/de/insights/blog/praise-go-script-part-i)
-</script>
-</section>
-
-<section data-markdown>
-<script type="text/template">
-## CI/CD Server Expectations 4
-
-* scalability (build agents)
-* customizable build environment
-  * reliable
-  * containerized builds
-  * easy cleanup
-* credentials management
-  * properly integrate existing solutions
-</script>
-</section>
-
-<section data-markdown>
-<script type="text/template">
-<h1 style="font-size: 600%">Pipelines that don't suck</h1>
-
-### 🔗 [Build pipelines that don't suck](https://github.com/sirech/talks/blob/master/2019-04-tw-build_pipelines.pdf) 👍👍👍
 </script>
 </section>
 
 <section data-markdown id="setup">
 <script type="text/template">
-<h1 style="font-size: 600%">Concourse Setup 🔧</h1>
+<h1 style="font-size: 500%">🔧 Concourse Setup</h1>
 </script>
 </section>
 
@@ -207,60 +188,49 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 
 <section data-markdown>
 <script type="text/template">
-## Cloud Installer
+## Configuration as Code
 
-* "CI-First-Approach"
-  1. Spin-up CI infrastructure
-  2. Deploy everything else using pipelines
+* TODO show how Concourse can be configured using container settings
+* TODO show UI and that there is no way of configuring anything
 
-* <a href="https://github.com/EngineerBetter/control-tower ">Control Tower</a> (EngineerBetter)
+* download `fly` CLI to `/usr/local/bin/fly`
 
+	```bash
+	export concourse_fqdn=localhost
+	curl --noproxy ${concourse_fqdn} -s -f -o /usr/local/bin/fly \
+		"http://${concourse_fqdn}:8080/api/v1/cli?arch=amd64&platform=darwin"
+	chmod u+x /usr/local/bin/fly
 	```
-	$ AWS_ACCESS_KEY_ID=<access-key-id> \
-		 AWS_SECRET_ACCESS_KEY=<secret-access-key> \
-		 control-tower deploy --iaas aws <your-project-name>
+
+* login to Concourse via
+
+	```bash
+	fly --target=demo login \
+		--concourse-url="http://${concourse_fqdn}:8080" \
+		--username=test --password=test --team-name=main
 	```
 
-</script>
-</section>
-				
-<section data-markdown id="architecture">
-<script type="text/template">
-<h1 style="font-size: 600%">📐 Concourse Architecture</h1>
 </script>
 </section>
 
 <section data-markdown>
 <script type="text/template">
-## Concourse Architecture
-* Concourse web
-* Database
-* Concourse Worker
-* `fly` CLI
-* <https://docs.pivotal.io/p-concourse/4-x/architecture.html>
+## Recap Setup Expectations
+
+<ul style="list-style: none; font-size: 120%">
+    <span class="fragment" data-fragment-index="1"><li>✅ runs in containers</li></span>
+    <span class="fragment" data-fragment-index="2"><li>✅ configuration as codee</li></span>
+    <span class="fragment" data-fragment-index="3"><li>✅ no configuration in UI</li></span>
+    <span class="fragment" data-fragment-index="4"><li>🤔 no plugins</li></span>
+    <span class="fragment" data-fragment-index="5"><li>🤔 updates</li></span>
+</ul>
+
 </script>
 </section>
 
-<section>
-<img src="images/architecture-overview.png" style="border: none; box-shadow: none">
-</section>
-
-<section data-markdown>
+<section data-markdown id="pipelines-in-concourse">
 <script type="text/template">
-## Some more details...
-* EVERYTHING runs in ~~Docker~~ containers
-  * resources as well as jobs
-* Stateless build jobs
-  * no passing of artifacts between jobs
-* Connects to external systems instead of re-inventing them
-  * e.g. Vault (credentials management), LDAP (user management)
-* ~~Plugins~~ Resources (more lightweight)
-</script>
-</section>
-
-<section data-markdown id="blocks">
-<script type="text/template">
-<h1 style="font-size: 500%">🏗 Basic Building Blocks</h1>
+<h1 style="font-size: 600%">🛢 Pipelines in Concourse</h1>
 </script>
 </section>
 
@@ -273,15 +243,71 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 
 <section data-markdown>
 <script type="text/template">
-## [Pipeline](https://concourse-ci.org/pipelines.html)
+## [Jobs](https://concourse-ci.org/jobs.html)
 
-* Glues everything together
-* Mainly configures 2 things:
-  1. set of **resources** (for input and output)
-  1. sequence of **jobs**
+* determine the action(s) of your pipeline
+* plan, which resource, which task, and in which order
+* **you cannot pass artifacts between jobs**
+<img src="images/job.png" width="80%" height="80%" style="border: none; box-shadow: none">
 </script>
 </section>
 
+<section data-markdown>
+<script type="text/template">
+## Hello ~~world~~ Pipeline
+
+* check file `demo/01-hello-pipeline/pipeline.yml`
+
+   ```yml
+   ---
+   jobs:
+     - name: hello-pipeline
+       plan:
+         - task: hello-pipeline
+           config:
+             platform: linux
+             image_resource:
+               type: docker-image
+               source: {repository: busybox}
+             run:
+               path: echo
+               args:
+                 - hello pipeline
+   ```
+
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Hello ~~world~~ Pipeline
+
+* **upload** pipeline via `fly`'s `set-pipeline` command
+
+   ```bash
+   fly --target=demo set-pipeline \
+       --non-interactive \
+       --pipeline=hello-pipeline \
+       --config=pipeline.yml
+   ```
+
+* afterwards **unpause** the pipeline via
+
+   ```bash
+   fly --target=demo unpause-pipeline -p hello-pipeline
+   ```
+
+* open the pipeline via [http://localhost:8080/teams/main/pipelines/hello-pipeline](http://localhost:8080/teams/main/pipelines/hello-pipeline)
+  * when asked to login, use `test` and `test`
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Hello ~~world~~ Pipeline
+<img src="images/hello-pipeline.png" style="border: none; box-shadow: none">
+</script>
+</section>
 
 <section data-markdown>
 <script type="text/template">
@@ -297,15 +323,64 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 
 <section data-markdown>
 <script type="text/template">
-## [Jobs](https://concourse-ci.org/jobs.html)
+## Pipeline with Resource
 
-* determine the action(s) of your pipeline
-* plan, which resource, which task, and in which order
-* **you cannot pass artifacts between jobs**
-<img src="images/job.png" width="80%" height="80%" style="border: none; box-shadow: none">
+```yml
+---
+resources:
+  - name: demo-repo
+    type: git
+    source:
+      uri: https://github.com/michaellihs/presentation-concourse-3rd-iteration.git
+      branch: master
+
+jobs:
+  - name: hello-world
+    plan:
+      - get: demo-repo
+      - task: hello-pipeline
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: busybox}
+          run:
+            path: demo/02-resources/hello-pipeline.sh
+```
+
 </script>
 </section>
 
+<section data-markdown>
+<script type="text/template">
+## Pipeline with Resource
+
+* **upload** pipeline via `fly`'s `set-pipeline` command
+
+   ```bash
+   fly --target=demo set-pipeline \
+       --non-interactive \
+       --pipeline=02-resources \
+       --config=pipeline.yml
+   ```
+
+* afterwards **unpause** the pipeline via
+
+   ```bash
+   fly --target=demo unpause-pipeline -p 02-resources
+   ```
+
+* open the pipeline via [http://localhost:8080/teams/main/pipelines/02-resources](http://localhost:8080/teams/main/pipelines/02-resources)
+  * when asked to login, use `test` and `test`
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Pipeline with Resource
+<img src="images/hello-resources.png" style="border: none; box-shadow: none">
+</script>
+</section>
 
 <section data-markdown>
 <script type="text/template">
@@ -321,6 +396,94 @@ see <a href="https://www.thoughtworks.com/de/radar/techniques/four-key-metrics">
 
 </script>
 </section>
+
+<section data-markdown>
+<script type="text/template">
+## Pipeline with externalized task
+
+* check pipeline in `demo/03-externalized-tasks/pipeline.yml`
+
+   ```yml
+   ---
+   resources:
+     - name: demo-repo
+       type: git
+       source:
+         uri: https://github.com/michaellihs/presentation-concourse-3rd-iteration.git
+         branch: master
+   
+   jobs:
+     - name: hello-pipeline
+       plan:
+         - get: demo-repo
+         - task: hello-pipeline
+           file: demo/03-externalized-tasks/task.yml
+   ```
+
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Pipeline with externalized task
+
+* check file `demo/03-externalized-tasks/task.yml`
+
+   ```yml
+   ---
+   platform: linux
+
+   image_resource:
+     type: docker-image
+     source: {repository: busybox}
+
+   inputs:
+     - name: demo-repo
+
+   run:
+     path: demo/03-externalized-tasks/hello-pipeline.sh
+
+   ```
+
+</script>
+</section>
+
+<section data-markdown>
+<script type="text/template">
+## Pipeline with externalized task
+
+* **upload** pipeline via `fly`'s `set-pipeline` command
+
+   ```bash
+   fly --target=demo set-pipeline \
+       --non-interactive \
+       --pipeline=03-externalized-tasks \
+       --config=pipeline.yml
+   ```
+
+* afterwards **unpause** the pipeline via
+
+   ```bash
+   fly --target=demo unpause-pipeline -p 03-externalized-tasks
+   ```
+
+* open the pipeline via [http://localhost:8080/teams/main/pipelines/03-externalized-tasks](http://localhost:8080/teams/main/pipelines/03-externalized-tasks)
+  * when asked to login, use `test` and `test`
+</script>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <section data-markdown id="demo">

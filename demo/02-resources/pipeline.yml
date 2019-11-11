@@ -1,0 +1,20 @@
+---
+resources:
+  - name: demo-repo
+    type: git
+    source:
+      uri: https://github.com/michaellihs/presentation-concourse-3rd-iteration.git
+      branch: master
+
+jobs:
+  - name: hello-world
+    plan:
+      - get: demo-repo
+      - task: hello-pipeline
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: busybox}
+          run:
+            path: demo/02-resources/hello-pipeline.sh

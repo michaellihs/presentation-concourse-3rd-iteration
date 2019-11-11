@@ -1,0 +1,14 @@
+---
+ resources:
+   - name: demo-repo
+     type: git
+     source:
+       uri: https://github.com/michaellihs/presentation-concourse-3rd-iteration.git
+       branch: master
+
+ jobs:
+   - name: hello-pipeline
+     plan:
+       - get: demo-repo
+       - task: hello-pipeline
+         file: demo/03-externalized-tasks/task.yml
